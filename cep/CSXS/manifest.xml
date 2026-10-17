@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtensionManifest Version="7.0" ExtensionBundleId="studio.vira.captions" ExtensionBundleVersion="0.1.0" ExtensionBundleName="Vira Captions">
+  <ExtensionList><Extension Id="studio.vira.captions.panel" Version="0.1.0"/></ExtensionList>
+  <ExecutionEnvironment><HostList><Host Name="PPRO" Version="[24.0,99.9]"/></HostList><LocaleList><Locale Code="All"/></LocaleList><RequiredRuntimeList><RequiredRuntime Name="CSXS" Version="11.0"/></RequiredRuntimeList></ExecutionEnvironment>
+  <DispatchInfoList><Extension Id="studio.vira.captions.panel"><DispatchInfo>
+    <Resources><MainPath>./index.html</MainPath><ScriptPath>./host/index.jsx</ScriptPath><CEFCommandLine><Parameter>--enable-nodejs</Parameter><Parameter>--mixed-context</Parameter></CEFCommandLine></Resources>
+    <Lifecycle><AutoVisible>true</AutoVisible></Lifecycle><UI><Type>Panel</Type><Menu>Vira Captions</Menu><Geometry><Size><Width>1180</Width><Height>780</Height></Size><MinSize><Width>340</Width><Height>480</Height></MinSize></Geometry></UI>
+  </DispatchInfo></Extension></DispatchInfoList>
+</ExtensionManifest>

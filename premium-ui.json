@@ -1,0 +1,14 @@
+{
+  "profile": "product-admin",
+  "sourceRoots": ["src"],
+  "locale": "en / fa-IR",
+  "canonicalMap": "UX-CONTRACT.md",
+  "requiredCapabilities": ["Select/Listbox", "Form", "Scrollbar", "Toast"],
+  "ownership": { "Select/Listbox": "native" },
+  "requiredCommands": ["unit", "e2e"],
+  "commands": { "unit": "npm test", "e2e": "npm run test:e2e" },
+  "evidence": {
+    "failurePaths": "tests/providers.test.ts",
+    "workflow": "tests/e2e/workspace.spec.ts"
+  }
+}
