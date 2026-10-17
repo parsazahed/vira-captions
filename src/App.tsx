@@ -35,7 +35,7 @@ import {
 import { Field, Select, Slider, Toggle } from "./components/Controls";
 import {
   ass,
-  estimatedWords,
+  wordsFromCues,
   makeCues,
   parseSrt,
   srt,
@@ -64,6 +64,7 @@ import type {
   ParagraphSettings,
   Provider,
   TranscriptionSettings,
+  Word,
 } from "./lib/types";
 
 const sample: Cue[] = [
@@ -130,7 +131,30 @@ export default function App() {
   const [playing, setPlaying] = useState(false);
   const [position, setPosition] = useState(0);
   const [safeArea, setSafeArea] = useState(false);
-  const [undo, setUndo] = useState<Cue[] | null>(null);
+  const wordTimings = useRef<Word[] | null>(null);
+  const wordTimingKind = useRef<"native" | "estimated" | "imported">(
+    "imported",
+  );
+  const [undo, setUndo] = useState<{
+    cues: Cue[];
+    paragraph: ParagraphSettings;
+    timing: typeof timing;
+    words: Word[] | null;
+    wordTimingKind: typeof timing;
+    isSample: boolean;
+    sequenceId?: string;
+  } | null>(null);
+  function rememberCaptions() {
+    setUndo({
+      cues,
+      paragraph,
+      timing,
+      words: wordTimings.current,
+      wordTimingKind: wordTimingKind.current,
+      isSample,
+      sequenceId,
+    });
+  }
   const [dirty, setDirty] = useState(false);
   const [replacement, setReplacement] = useState<(() => void) | null>(null);
   const audioInput = useRef<HTMLInputElement>(null);
@@ -162,7 +186,10 @@ export default function App() {
     key: K,
     value: ParagraphSettings[K],
   ) => {
-    setParagraph((s) => ({ ...s, [key]: value }));
+    if (busy) return;
+    const next = { ...paragraph, [key]: value };
+    if (cues.length && !applyParagraph(next)) return;
+    setParagraph(next);
     setDirty(true);
   };
   const updateSettings = <K extends keyof TranscriptionSettings>(
@@ -333,7 +360,13 @@ export default function App() {
       if (validation) throw new Error(validation);
       if (!next.length)
         throw new Error("No speech was returned. Check the audio.");
-      setUndo(cues);
+      rememberCaptions();
+      wordTimings.current = result.words.map((word) => ({
+        ...word,
+        start: word.start + media.offset,
+        end: word.end + media.offset,
+      }));
+      wordTimingKind.current = result.timing;
       setCues(next);
       setSequenceId(media.sequenceId);
       setActive(0);
@@ -363,7 +396,8 @@ export default function App() {
       const project = type === "project" ? readProject(text) : null;
       const next = project ? project.cues : parseSrt(text);
       replace(() => {
-        setUndo(cues);
+        rememberCaptions();
+        wordTimings.current = null;
         setCues(next);
         if (project) {
           setStyle(project.style);
@@ -383,6 +417,7 @@ export default function App() {
     }
   }
   function editCue(id: string, update: Partial<Cue>) {
+    wordTimings.current = null;
     setCues((current) =>
       current.map((c) => (c.id === id ? { ...c, ...update } : c)),
     );
@@ -442,26 +477,29 @@ export default function App() {
       notify(errorText(e), true);
     }
   }
-  function reflow() {
+  function applyParagraph(next: ParagraphSettings): boolean {
     const error = validateCues(cues);
-    if (error) return notify(error, true);
-    setUndo(cues);
-    setCues(
-      makeCues(
-        cues.flatMap((c) =>
-          estimatedWords(c.text, c.end - c.start).map((w) => ({
-            ...w,
-            start: w.start + c.start,
-            end: w.end + c.start,
-          })),
-        ),
-        paragraph,
-      ),
-    );
+    if (error) {
+      notify(error, true);
+      return false;
+    }
+    rememberCaptions();
+    if (!wordTimings.current) {
+      const restored = wordsFromCues(cues);
+      wordTimings.current = restored.words;
+      wordTimingKind.current = restored.estimated ? "estimated" : timing;
+    }
+    const regrouped = makeCues(wordTimings.current, next);
+    setCues(regrouped);
     setActive(0);
-    setTiming("estimated");
+    setPosition(regrouped[0]?.start || 0);
+    setPlaying(false);
+    setTiming(wordTimingKind.current);
     setDirty(true);
-    notify("Captions reflowed. Timing needs review.");
+    return true;
+  }
+  function reflow() {
+    if (applyParagraph(paragraph)) notify("Paragraph settings applied.");
   }
   return (
     <div className="app-shell">
@@ -785,6 +823,11 @@ export default function App() {
                       options={["1", "2", "3"].map((v) => [v, v])}
                     />
                   </div>
+                  <p className="paragraph-help">
+                    {t(
+                      "Changes apply immediately. Pauses and duration limits can make a line shorter.",
+                    )}
+                  </p>
                   <details>
                     <summary>
                       {t("Advanced settings")}
@@ -1116,20 +1159,31 @@ export default function App() {
                   onSelect={selectCue}
                   onEdit={editCue}
                   onLoadSample={() => {
+                    wordTimings.current = null;
                     setCues(sample);
                     setIsSample(true);
                   }}
                   onRemove={(id) => {
-                    setUndo(cues);
+                    rememberCaptions();
+                    wordTimings.current = null;
                     setCues(cues.filter((c) => c.id !== id));
                     setActive(Math.max(0, Math.min(active, cues.length - 2)));
                     setDirty(true);
                     notify("Caption removed.");
                   }}
                   onUndo={() => {
-                    if (undo) setCues(undo);
+                    if (!undo) return;
+                    setCues(undo.cues);
+                    setParagraph(undo.paragraph);
+                    setTiming(undo.timing);
+                    wordTimings.current = undo.words;
+                    wordTimingKind.current = undo.wordTimingKind;
+                    setIsSample(undo.isSample);
+                    setSequenceId(undo.sequenceId);
                     setUndo(null);
                     setActive(0);
+                    setPosition(undo.cues[0]?.start || 0);
+                    setPlaying(false);
                     setDirty(true);
                   }}
                 />
@@ -1215,7 +1269,7 @@ export default function App() {
               </span>
               <span>
                 VIRA / OPEN SOURCE<span className="status-separator">·</span>
-                v0.2.0
+                v0.2.1
               </span>
             </div>
           </>

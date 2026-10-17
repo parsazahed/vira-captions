@@ -34,6 +34,28 @@ export function estimatedWords(text: string, duration: number): Word[] {
     return { text, start, end: cursor };
   });
 }
+/** Rebuild words from edited/imported cues without retaining their old line breaks.
+ * Single-word cues already have exact boundaries; longer cues need interpolation.
+ */
+export function wordsFromCues(cues: Cue[]): {
+  words: Word[];
+  estimated: boolean;
+} {
+  let estimated = false;
+  const words = cues.flatMap((cue) => {
+    const tokens = cue.text.trim().split(/\s+/).filter(Boolean);
+    if (tokens.length === 1)
+      return [{ text: tokens[0], start: cue.start, end: cue.end }];
+    if (tokens.length > 1) estimated = true;
+    return estimatedWords(cue.text, cue.end - cue.start).map((word) => ({
+      ...word,
+      start: word.start + cue.start,
+      end: word.end + cue.start,
+    }));
+  });
+  return { words, estimated };
+}
+
 export function makeCues(
   words: Word[],
   settings: ParagraphSettings,
@@ -41,7 +63,9 @@ export function makeCues(
 ): Cue[] {
   const groups: Word[][] = [];
   let group: Word[] = [];
-  for (const word of words) {
+  for (const input of words) {
+    const word = { ...input, text: input.text.replace(/\s+/g, " ").trim() };
+    if (!word.text) continue;
     const previous = group[group.length - 1];
     if (
       previous &&

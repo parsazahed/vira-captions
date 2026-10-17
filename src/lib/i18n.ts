@@ -1,5 +1,8 @@
 import type { Locale } from "./types";
 const fa: Record<string, string> = {
+  "Paragraph settings applied.": "تنظیمات پاراگراف اعمال شد.",
+  "Changes apply immediately. Pauses and duration limits can make a line shorter.":
+    "تغییرات بلافاصله اعمال می‌شوند. مکث‌ها و محدودیت زمان ممکن است خط را کوتاه‌تر کنند.",
   "Click Connect your speech service and paste your API key. OpenAI and GPT transcribe are already selected for you.":
     "روی اتصال سرویس گفتار بزنید و کلید API را وارد کنید. OpenAI و مدل GPT از قبل انتخاب شده‌اند.",
   "Choose Whole timeline for your entire edit, Selected video for one clip, or Marked section for the part between your In and Out marks. Vira prepares the audio automatically.":

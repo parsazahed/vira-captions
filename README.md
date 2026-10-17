@@ -6,7 +6,7 @@ Vira brings transcription, caption editing, and typography into a resizable Prem
 
 ![Vira subtitle workspace](docs/vira-workspace.png)
 
-> **Developer preview · v0.2.0.** The browser workflow is tested. Premiere 24.x–26.x on macOS is the compatibility target; in-host acceptance testing is still required. No live paid provider calls have been made during automated verification.
+> **Developer preview · v0.2.1.** The browser workflow is tested. Premiere 24.x–26.x on macOS is the compatibility target; in-host acceptance testing is still required. No live paid provider calls have been made during automated verification.
 
 ## What it does
 
@@ -89,7 +89,7 @@ Synchronous Premiere export can block the host and cannot be canceled mid-export
 | OpenAI `whisper-1`, Groq Whisper, Deepgram                      | Provider word timestamps when returned                         |
 | Custom endpoint                                                 | Word timestamps when supplied; otherwise estimated             |
 
-GPT transcription does not provide forced alignment. Vira does not silently make a second paid alignment call. Long silence makes duration-based timing especially approximate. Reflow uses current cue boundaries to estimate word positions and is labeled accordingly. Use Whisper/Deepgram for timestamped captions, or correct GPT times manually.
+GPT transcription does not provide forced alignment. Vira does not silently make a second paid alignment call. Long silence makes duration-based timing especially approximate. Words-per-line and paragraph changes apply immediately to the current captions and all exports. Original transcription word timestamps are retained until text or timing is edited. Imported or edited multi-word cues need estimated word positions when regrouped, which is labeled accordingly. Pauses and the maximum-duration limit can produce lines shorter than the selected word count. Use Whisper/Deepgram for timestamped captions, or correct GPT times manually.
 
 Uploads are limited to 24 MiB. Larger timeline exports need a shorter In/Out range; automatic multi-request chunking is not implemented. Generation makes one request, with no hidden retries. Provider/model access, pricing, supported languages, and quota belong to the provider.
 

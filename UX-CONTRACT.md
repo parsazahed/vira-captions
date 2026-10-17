@@ -29,7 +29,7 @@
 
 Generate → validate key/source → extract if needed → send one provider request → replace cues on success only. Preserve prior cues on error/cancel. Disable duplicate generation; Cancel aborts HTTP/FFmpeg. Premiere's synchronous export itself cannot be interrupted.
 
-Edit → update local text/time immediately → mark dirty → preview follows selection → validate before export/reflow. Remove → retain previous cue array → Undo. Reflow → estimate words inside current cue boundaries → apply paragraph settings → label estimated.
+Edit → update local text/time immediately → mark dirty → preview follows selection → validate before export/reflow. Remove → retain previous cue array → Undo. Changing any paragraph setting or clicking Reflow → immediately rebuild current captions → preserve cached original word timestamps when available → reconstruct imported/edited words only when needed → label estimated timing when interpolation is necessary. Export uses the same visible caption array. Undo restores captions, paragraph settings, timing metadata, and source sequence identity together.
 
 Import SRT/project → parse and validate → if dirty non-sample captions exist, ask before replacing → restore focus on cancel. Project files never contain audio, API keys, endpoints, or prompts. They may preserve source sequence identity for safe reimport.
 

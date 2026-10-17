@@ -1,3 +1,4 @@
+import { parseSrt } from "../../src/lib/captions";
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 const srt =
@@ -263,4 +264,53 @@ test("beginner setup explains the key and never asks for audio presets", async (
     .click();
   await page.getByText("Change speech service", { exact: true }).click();
   await expect(page.getByLabel("Model", { exact: true })).toBeVisible();
+});
+
+test("changing words per line immediately fixes single-word SRT and preserves edits in the download", async ({
+  page,
+}) => {
+  const words = "یک دو سه چهار پنج شش هفت هشت نه ده یازده دوازده".split(" ");
+  const input = words
+    .map(
+      (word, index) =>
+        `${index + 1}\n00:00:${String(index).padStart(2, "0")},000 --> 00:00:${String(index).padStart(2, "0")},900\n${word}`,
+    )
+    .join("\n\n");
+  await page.locator('input[accept=".srt"]').setInputFiles({
+    name: "word-by-word.srt",
+    mimeType: "text/plain",
+    buffer: Buffer.from(input),
+  });
+  await expect(page.locator(".caption-row")).toHaveCount(12);
+  await page.getByLabel("Caption text 1", { exact: true }).fill("می‌روم");
+  // Keep advanced duration above six seconds so this test isolates the word limit.
+  await page.getByText("Advanced settings", { exact: true }).click();
+  await page.getByLabel("Maximum duration", { exact: true }).fill("10");
+  await page.getByLabel("Maximum lines", { exact: true }).selectOption("1");
+  await page.getByLabel("Words per line", { exact: true }).selectOption("1");
+  await expect(page.locator(".caption-row")).toHaveCount(12);
+  await page.getByLabel("Words per line", { exact: true }).selectOption("6");
+  await expect(page.locator(".caption-row")).toHaveCount(2);
+  await expect(page.getByLabel("Caption text 1", { exact: true })).toHaveValue(
+    "می‌روم دو سه چهار پنج شش",
+  );
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export file", exact: true }).click();
+  const file = await pending;
+  const stream = await file.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream!) chunks.push(Buffer.from(chunk));
+  const exported = parseSrt(Buffer.concat(chunks).toString("utf8"));
+  expect(exported.map((cue) => cue.text.split(/\s+/).length)).toEqual([6, 6]);
+  expect(exported[0]).toMatchObject({
+    start: 0,
+    end: 5.9,
+    text: "می‌روم دو سه چهار پنج شش",
+  });
+  expect(exported[1]).toMatchObject({ start: 6, end: 11.9 });
+  await page.getByRole("button", { name: "Undo", exact: true }).click();
+  await expect(page.locator(".caption-row")).toHaveCount(12);
+  await expect(page.getByLabel("Words per line", { exact: true })).toHaveValue(
+    "1",
+  );
 });

@@ -3,6 +3,7 @@ import {
   ass,
   estimatedWords,
   makeCues,
+  wordsFromCues,
   normalizePersian,
   parseSrt,
   srt,
@@ -107,4 +108,51 @@ describe("formats and project safety", () => {
         JSON.stringify({ version: 1, cues: [{ ...cues[0], end: 0 }] }),
       ),
     ).toThrow());
+});
+
+describe("regrouping existing captions", () => {
+  const text = "یک دو سه چهار پنج شش هفت هشت نه ده یازده دوازده";
+  const words = text.split(" ").map((text, index) => ({
+    text,
+    start: index * 0.3,
+    end: index * 0.3 + 0.2,
+  }));
+  it("combines single-word SRT cues into six-word lines without shifting their boundaries", () => {
+    const imported = words.map((w, index) => ({ id: String(index), ...w }));
+    const restored = wordsFromCues(imported);
+    expect(restored.estimated).toBe(false);
+    const result = parseSrt(
+      srt(makeCues(restored.words, { ...defaultParagraph, maxLines: 1 })),
+    );
+    expect(result.map((c) => c.text.split(/\s+/).length)).toEqual([6, 6]);
+    expect(result[0].start).toBe(words[0].start);
+    expect(result[0].end).toBeCloseTo(words[5].end, 3);
+    expect(result[1].start).toBeCloseTo(words[6].start, 3);
+    expect(result[1].end).toBeCloseTo(words[11].end, 3);
+  });
+  it("removes embedded provider newlines before applying paragraph line breaks", () => {
+    const dirty = words.map((word) => ({ ...word, text: `\n${word.text}\n` }));
+    const result = makeCues(dirty, { ...defaultParagraph, maxLines: 1 });
+    expect(result).toHaveLength(2);
+    expect(result.every((cue) => !cue.text.includes("\n"))).toBe(true);
+    expect(result[0].text.split(" ")).toHaveLength(6);
+  });
+  it("preserves edited text and ZWNJ while removing the old wrapping", () => {
+    const result = wordsFromCues([
+      { id: "1", start: 10, end: 13, text: "می‌روم\nبه خانه Vira" },
+    ]);
+    expect(result.estimated).toBe(true);
+    expect(result.words.map((w) => w.text).join(" ")).toBe(
+      "می‌روم به خانه Vira",
+    );
+    expect(result.words[0].start).toBe(10);
+    expect(result.words[result.words.length - 1].end).toBeCloseTo(13);
+  });
+  it("keeps real long pauses when regrouping single-word cues", () => {
+    const restored = wordsFromCues([
+      { id: "1", start: 0, end: 0.2, text: "سلام" },
+      { id: "2", start: 5, end: 5.2, text: "دنیا" },
+    ]);
+    expect(makeCues(restored.words, defaultParagraph)).toHaveLength(2);
+  });
 });

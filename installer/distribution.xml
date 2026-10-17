@@ -7,5 +7,5 @@
   <domains enable_localSystem="true" enable_currentUserHome="false" enable_anywhere="false"/>
   <choices-outline><line choice="vira"/></choices-outline>
   <choice id="vira" visible="false" title="Vira Captions Preview"><pkg-ref id="studio.vira.captions.preview"/></choice>
-  <pkg-ref id="studio.vira.captions.preview" version="0.2.0" onConclusion="none">Vira-component.pkg</pkg-ref>
+  <pkg-ref id="studio.vira.captions.preview" version="0.2.1" onConclusion="none">Vira-component.pkg</pkg-ref>
 </installer-gui-script>

@@ -18,7 +18,7 @@ execFileSync(
     "--identifier",
     "studio.vira.captions.preview",
     "--version",
-    "0.2.0",
+    "0.2.1",
     `${output}/Vira-component.pkg`,
   ],
   { stdio: "inherit" },
