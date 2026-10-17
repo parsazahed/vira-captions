@@ -102,6 +102,8 @@ Keys are masked and held in React memory, separately per provider, until the pan
 src/App.tsx                    Application state and editing workflows
 src/components/Controls.tsx   Shared accessible native controls
 src/components/AppearancePanel.tsx  Typography inspector
+src/components/TranscriptPanel.tsx  Caption editing and search
+src/components/Guide.tsx       Bilingual usage guide
 src/lib/captions.ts           Persian normalization, grouping, SRT/VTT/ASS
 src/lib/providers.ts          Provider-specific request/response adapters
 src/lib/transport.ts          Browser fetch / CEP Node HTTPS

@@ -138,8 +138,13 @@ export async function transcribe(
     );
   }
   let data;
-  try { data = await response.json(); }
-  catch { throw new Error('Provider returned an invalid JSON response. Check the endpoint or choose another model.'); }
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error(
+      "Provider returned an invalid JSON response. Check the endpoint or choose another model.",
+    );
+  }
   const native =
     data.words || data.results?.channels?.[0]?.alternatives?.[0]?.words;
   if (Array.isArray(native) && native.length) {

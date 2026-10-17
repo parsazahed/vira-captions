@@ -7,12 +7,9 @@ import {
   ArrowDownToLine,
   ArrowLeft,
   ArrowRight,
-  ArrowUpRight,
   Check,
   ChevronDown,
-  ChevronRight,
   CircleHelp,
-  Clock3,
   FileAudio,
   Film,
   FolderOpen,
@@ -21,27 +18,21 @@ import {
   Layers3,
   LoaderCircle,
   Maximize2,
-  MoreHorizontal,
   Pause,
   Play,
   Plus,
   RefreshCw,
-  Search,
   Settings2,
   ShieldCheck,
-  SlidersHorizontal,
   Sparkles,
   Subtitles,
-  Trash2,
-  Type,
   Upload,
   X,
   Eye,
   EyeOff,
   Save,
-  Undo2,
 } from "lucide-react";
-import { Color, Field, Select, Slider, Toggle } from "./components/Controls";
+import { Field, Select, Slider, Toggle } from "./components/Controls";
 import {
   ass,
   estimatedWords,
@@ -432,6 +423,8 @@ export default function App() {
     }
   }
   async function saveProject() {
+    const error = validateCues(cues);
+    if (error) return notify(error, true);
     try {
       if (
         await download(
@@ -883,7 +876,7 @@ export default function App() {
                 <section className="preview-panel panel" ref={studio}>
                   <div className="panel-heading">
                     <h2>{t("Preview")}</h2>
-                    <span className="preview-label">
+                    <span className="preview-label" dir="ltr">
                       1920 × 1080<span>16:9</span>
                     </span>
                   </div>
