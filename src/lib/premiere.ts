@@ -1,3 +1,4 @@
+import { findAudioPresets } from "./audio-presets";
 import { renderCaption } from "./render";
 import type { CaptionStyle, Cue, MediaSource } from "./types";
 declare global {
@@ -66,7 +67,18 @@ export async function extractAudio(
       path?: string;
       inPoint?: number;
       sequenceId: string;
-    }>("audio", { mode, output: raw });
+    }>("audio", {
+      mode,
+      output: raw,
+      presets:
+        mode === "clip"
+          ? []
+          : findAudioPresets(
+              window.__adobe_cep__!.getSystemPath("hostApplication"),
+              fs,
+              path,
+            ),
+    });
     if (signal.aborted) throw new DOMException("Canceled", "AbortError");
     const ffmpeg = path.join(
       root,
@@ -143,7 +155,6 @@ export async function addToTimeline(content: string, sequenceId?: string) {
   fs.writeFileSync(file, "\uFEFF" + content, "utf8");
   return host("importCaptions", { path: file, sequenceId });
 }
-export const choosePreset = () => host<{ path: string }>("choosePreset");
 export function download(
   content: string,
   filename: string,

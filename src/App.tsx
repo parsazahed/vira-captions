@@ -47,7 +47,6 @@ import { languages, translate } from "./lib/i18n";
 import {
   addToTimeline,
   addStyledOverlays,
-  choosePreset,
   download,
   extractAudio,
   getSequence,
@@ -117,7 +116,6 @@ export default function App() {
   const [source, setSource] = useState<MediaSource>();
   const [sequence, setSequence] = useState<SequenceInfo>();
   const [sequenceId, setSequenceId] = useState<string>();
-  const [preset, setPreset] = useState("");
   const [showKey, setShowKey] = useState(false);
   const [timing, setTiming] = useState<"native" | "estimated" | "imported">(
     "imported",
@@ -503,7 +501,7 @@ export default function App() {
         >
           <CircleHelp size={21} />
         </button>
-        <span className="version">0.1</span>
+        <span className="version">0.2</span>
       </aside>
       <div className="app-body">
         <header className="topbar">
@@ -564,6 +562,53 @@ export default function App() {
                 </button>
               </div>
             </div>
+            <div className="getting-started" aria-label={t("Getting started")}>
+              <button
+                className="getting-started-step"
+                onClick={() => setPage("connections")}
+              >
+                <span
+                  className={
+                    settings.key ? "step-number complete" : "step-number"
+                  }
+                >
+                  {settings.key ? <Check size={14} /> : "1"}
+                </span>
+                <span>
+                  <strong>
+                    {t(
+                      settings.key
+                        ? "Speech service connected"
+                        : "Connect your speech service",
+                    )}
+                  </strong>
+                  <small>
+                    {t("Paste your API key. Keep the default settings.")}
+                  </small>
+                </span>
+                {!settings.key && <ArrowRight size={16} />}
+              </button>
+              <div className="getting-started-step">
+                <span className="step-number">2</span>
+                <span>
+                  <strong>{t("Choose what to subtitle")}</strong>
+                  <small>
+                    {t(
+                      "Your whole timeline, a selected video, or an audio file.",
+                    )}
+                  </small>
+                </span>
+              </div>
+              <div className="getting-started-step">
+                <span className="step-number">3</span>
+                <span>
+                  <strong>{t("Create your subtitles")}</strong>
+                  <small>
+                    {t("Choose the language, then click Generate subtitles.")}
+                  </small>
+                </span>
+              </div>
+            </div>
             <div className="workspace-grid">
               <aside className="setup-panel panel">
                 <section>
@@ -575,9 +620,9 @@ export default function App() {
                   </h2>
                   <div className="source-options">
                     {[
-                      ["sequence", Layers3, "Active sequence"],
-                      ["range", Maximize2, "In / Out range"],
-                      ["clip", Film, "Selected clip"],
+                      ["sequence", Layers3, "Whole timeline"],
+                      ["range", Maximize2, "Marked section"],
+                      ["clip", Film, "Selected video"],
                       ["file", FileAudio, "Audio file"],
                     ].map(([id, Icon, label]) => {
                       const I = Icon as typeof Film;
@@ -650,38 +695,46 @@ export default function App() {
                       <Settings2 size={15} />
                     </button>
                   </h2>
-                  <Select
-                    label={t("Provider")}
-                    value={settings.provider}
-                    onChange={(v) => switchProvider(v as Provider)}
-                    options={Object.entries(providers).map(([id, p]) => [
-                      id,
-                      p.name,
-                    ])}
-                    disabled={busy}
-                  />
-                  {settings.provider === "custom" ? (
-                    <Field label={t("Custom model ID")}>
-                      <input
-                        aria-label={t("Custom model ID")}
-                        value={settings.model}
-                        onChange={(e) =>
-                          updateSettings("model", e.target.value)
-                        }
-                      />
-                    </Field>
-                  ) : (
+                  <p className="service-summary">
+                    {providers[settings.provider].name} · {settings.model}
+                  </p>
+                  <details>
+                    <summary>
+                      {t("Change speech service")}
+                      <ChevronDown size={14} />
+                    </summary>
                     <Select
-                      label={t("Model")}
-                      value={settings.model}
-                      onChange={(v) => updateSettings("model", v)}
-                      options={providers[settings.provider].models.map((v) => [
-                        v,
-                        v,
+                      label={t("Provider")}
+                      value={settings.provider}
+                      onChange={(v) => switchProvider(v as Provider)}
+                      options={Object.entries(providers).map(([id, p]) => [
+                        id,
+                        p.name,
                       ])}
                       disabled={busy}
                     />
-                  )}
+                    {settings.provider === "custom" ? (
+                      <Field label={t("Custom model ID")}>
+                        <input
+                          aria-label={t("Custom model ID")}
+                          value={settings.model}
+                          onChange={(e) =>
+                            updateSettings("model", e.target.value)
+                          }
+                        />
+                      </Field>
+                    ) : (
+                      <Select
+                        label={t("Model")}
+                        value={settings.model}
+                        onChange={(v) => updateSettings("model", v)}
+                        options={providers[settings.provider].models.map(
+                          (v) => [v, v],
+                        )}
+                        disabled={busy}
+                      />
+                    )}
+                  </details>
                   <div className="engine-note">
                     <span className="mini-badge">
                       {settings.model.includes("whisper") ||
@@ -1162,7 +1215,7 @@ export default function App() {
               </span>
               <span>
                 VIRA / OPEN SOURCE<span className="status-separator">·</span>
-                v0.1.0
+                v0.2.0
               </span>
             </div>
           </>
@@ -1191,6 +1244,21 @@ export default function App() {
                   ])}
                   disabled={busy}
                 />
+                <p className="key-help">
+                  {t(
+                    "Your API key is a secret code from your speech service. Paste it below; the other settings are ready to use.",
+                  )}
+                </p>
+                {settings.provider === "openai" && (
+                  <a
+                    className="setup-link"
+                    href="https://platform.openai.com/api-keys"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t("Get an OpenAI API key")} ↗
+                  </a>
+                )}
                 <Field label={t("API key")}>
                   <div className="secret-input">
                     <input
@@ -1271,31 +1339,18 @@ export default function App() {
               <div>
                 <section className="panel settings-card">
                   <h2>
-                    <Layers3 size={18} />
-                    {t("Timeline audio export")}
+                    <Check size={18} />
+                    {t("Audio setup is automatic")}
                   </h2>
                   <p>
                     {t(
-                      "Create an audio-only WAV export preset in Premiere, then select its .epr file here. Selected clips use FFmpeg directly.",
+                      "Choose your video or timeline and Vira prepares the sound for you. There are no audio files or export settings to create.",
                     )}
                   </p>
-                  <button
-                    className="button secondary"
-                    disabled={!hostAvailable}
-                    onClick={async () => {
-                      try {
-                        const result = await choosePreset();
-                        setPreset(result.path);
-                      } catch (e) {
-                        notify(errorText(e), true);
-                      }
-                    }}
-                  >
-                    <FolderOpen size={16} />
-                    {t("Choose WAV preset")}
-                  </button>
-                  <p className="preset-path">
-                    {preset || t("No preset selected")}
+                  <p className="hint">
+                    {t(
+                      "If your Premiere installation cannot prepare timeline audio, you can still use Selected video or choose an audio file.",
+                    )}
                   </p>
                 </section>
                 <div className="privacy-note">

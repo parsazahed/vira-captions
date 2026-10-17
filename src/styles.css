@@ -1609,3 +1609,69 @@ dialog p {
 .export-actions .timeline-mode {
   width: 137px;
 }
+.getting-started {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 30px 23px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: var(--radius);
+}
+.getting-started-step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 17px;
+  text-align: start;
+  min-width: 0;
+}
+.getting-started-step + .getting-started-step {
+  border-inline-start: 1px solid var(--line);
+}
+.getting-started-step strong {
+  font-size: 11px;
+  display: block;
+}
+.getting-started-step small {
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  margin-top: 4px;
+}
+.step-number {
+  width: 27px;
+  height: 27px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.step-number.complete {
+  color: var(--success);
+}
+.service-summary {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+.key-help {
+  margin: 15px 0 8px;
+  color: var(--muted);
+}
+.setup-link {
+  color: var(--accent);
+  text-underline-offset: 3px;
+}
+@media (max-width: 740px) {
+  .getting-started {
+    margin-inline: 16px;
+    grid-template-columns: 1fr;
+  }
+  .getting-started-step + .getting-started-step {
+    border-inline-start: 0;
+    border-top: 1px solid var(--line);
+  }
+}

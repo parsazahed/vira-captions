@@ -35,15 +35,42 @@ describe("Premiere host safety contracts (mocked DOM)", () => {
       id: "123",
     });
   });
-  it("requires an audio preset before timeline export", () => {
+  it("explains recovery when automatic audio setup is unavailable", () => {
     const exportFn = vi.fn();
     const result = bridge({
       sequenceID: "1",
       end: 2540160000000,
       exportAsMediaDirect: exportFn,
     }).audio({ mode: "sequence", output: "output.wav" });
-    expect(JSON.parse(result).error).toContain(".epr");
+    expect(JSON.parse(result).error).toContain("Try Selected video");
     expect(exportFn).not.toHaveBeenCalled();
+  });
+  it("validates installed WAV settings and renders a marked section without manual setup", () => {
+    const exportFn = vi.fn(() => true);
+    const extension = vi.fn((file: string) =>
+      file === "/stock/audio.epr" ? "wav" : "mp4",
+    );
+    const result = JSON.parse(
+      bridge({
+        name: "Timeline",
+        sequenceID: "1",
+        end: 2540160000000,
+        getExportFileExtension: extension,
+        getInPointAsTime: () => ({ seconds: 2 }),
+        getOutPointAsTime: () => ({ seconds: 7 }),
+        exportAsMediaDirect: exportFn,
+      }).audio({
+        mode: "range",
+        output: "/temp/audio.wav",
+        presets: ["/stock/video.epr", "/stock/audio.epr"],
+      }),
+    );
+    expect(exportFn).toHaveBeenCalledWith(
+      "/temp/audio.wav",
+      "/stock/audio.epr",
+      1,
+    );
+    expect(result).toMatchObject({ duration: 5, offset: 2, sequenceId: "1" });
   });
   it("retains selected-clip source trim and timeline offset", () => {
     const clip = {

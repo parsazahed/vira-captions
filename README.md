@@ -6,7 +6,7 @@ Vira brings transcription, caption editing, and typography into a resizable Prem
 
 ![Vira subtitle workspace](docs/vira-workspace.png)
 
-> **Developer preview · v0.1.0.** The browser workflow is tested. Premiere 24.x–26.x on macOS is the compatibility target; in-host acceptance testing is still required. No live paid provider calls have been made during automated verification.
+> **Developer preview · v0.2.0.** The browser workflow is tested. Premiere 24.x–26.x on macOS is the compatibility target; in-host acceptance testing is still required. No live paid provider calls have been made during automated verification.
 
 ## What it does
 
@@ -20,6 +20,14 @@ Vira brings transcription, caption editing, and typography into a resizable Prem
 - Control font, weight, size, color, stroke, shadow, background, position, alignment, direction, and preview line spacing.
 - Add a native caption track, or render styled transparent PNG overlays onto an empty video track.
 - Export SRT, VTT, styled ASS, or save/open a Vira JSON project.
+
+## Install without Terminal (Apple Silicon Mac preview)
+
+Use **Vira-Preview-macOS-arm64.pkg**, the Mac installer produced by this project. Double-click it and follow the on-screen steps. You do not need to copy folders, install Node.js, or type commands. Quit and reopen Premiere, then choose **Window → Extensions → Vira Captions** (sometimes **Extensions (Legacy)**).
+
+This installer is an **unsigned development preview**, not a signed/notarized public release. Its Welcome screen explicitly explains that installation enables Adobe's unsigned CEP-extension mode for your Mac account. It does not bypass macOS Gatekeeper. If macOS blocks the installer, stop there; a signed distribution is still needed for a friction-free public installation. The installer itself has been built and inspected, but has not been executed on a Premiere machine.
+
+Developers can build it on an Apple Silicon Mac with `npm run package:mac`. The package remains local in `release/`; no binary installer has been published as a GitHub Release. Original source and dependency manifests are public.
 
 ## Run in a browser
 
@@ -60,12 +68,15 @@ Developer mode allows unsigned CEP extensions. This project never changes that s
 
 On Windows, build on Windows and copy `release/Vira` to `%APPDATA%\Adobe\CEP\extensions\Vira`; follow Adobe's CEP instructions for unsigned development extensions.
 
-### Timeline audio setup
+### Start making subtitles
 
-1. In Premiere's Export workspace, choose **Waveform Audio** with video disabled; save an **audio-only WAV** preset as an `.epr` file.
-2. In Vira → Connections, select that preset. This choice lasts for the panel session.
-3. Choose Active sequence or In/Out range. Vira exports the sequence mix with Premiere's effects/mutes, then converts it locally to mono 16 kHz MP3 before upload.
-4. For Selected clip, select one audio clip or a linked audio/video pair. FFmpeg extracts the underlying media using clip In/Out and preserves its timeline offset. This path does **not** render timeline effects, gain, or remapping. Use a sequence range for the actual processed mix. Retimed, reversed, nested, and offline clips require the sequence route.
+1. In Vira, click **Connect your speech service** and paste your API key. Leave the other settings as they are.
+2. Choose **Whole timeline**, **Selected video**, or **Marked section** and select the spoken language.
+3. Click **Generate subtitles**. Read through the result and check the timing, then click **Add to timeline**.
+
+**Vira prepares the audio automatically. You do not need to create a WAV file or an export preset.** It finds the built-in audio settings beside your running Premiere application and asks Premiere to validate them. If your installation has no compatible setting, Vira explains how to continue with Selected video or an audio file. Automatic discovery still needs verification on real Premiere installations.
+
+Selected video uses the clip's original sound. For timeline effects, volume changes, or retimed clips, choose Whole timeline or Marked section instead.
 
 Synchronous Premiere export can block the host and cannot be canceled mid-export. FFmpeg extraction and network requests can be canceled. Temporary extracted audio is removed after reading. Imported SRT/PNG assets are retained in `~/Documents/Vira Captions` because Premiere references them.
 

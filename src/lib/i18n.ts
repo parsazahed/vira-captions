@@ -1,5 +1,38 @@
 import type { Locale } from "./types";
 const fa: Record<string, string> = {
+  "Click Connect your speech service and paste your API key. OpenAI and GPT transcribe are already selected for you.":
+    "روی اتصال سرویس گفتار بزنید و کلید API را وارد کنید. OpenAI و مدل GPT از قبل انتخاب شده‌اند.",
+  "Choose Whole timeline for your entire edit, Selected video for one clip, or Marked section for the part between your In and Out marks. Vira prepares the audio automatically.":
+    "برای تمام تدوین، تمام تایم‌لاین را انتخاب کنید؛ برای یک کلیپ، ویدیوی انتخاب‌شده و برای بخشی از تدوین، محدوده مشخص‌شده را بزنید. ویرا صدا را خودکار آماده می‌کند.",
+  "Choose the spoken language and click Generate subtitles. Read through the result, correct any words, and check when each caption appears.":
+    "زبان گفتار را انتخاب کنید و ساخت زیرنویس را بزنید. متن را بخوانید، واژه‌ها را اصلاح کنید و زمان نمایش هر زیرنویس را بررسی کنید.",
+  "Click Add to timeline to put the subtitles in your edit. You can also choose a look in Appearance or save a subtitle file with Export file.":
+    "برای افزودن زیرنویس به تدوین، افزودن به تایم‌لاین را بزنید. می‌توانید در بخش ظاهر، قالب را انتخاب کنید یا با دریافت فایل، زیرنویس را ذخیره کنید.",
+
+  "Audio setup is automatic": "آماده‌سازی صدا خودکار است",
+  "Choose your video or timeline and Vira prepares the sound for you. There are no audio files or export settings to create.":
+    "ویدیو یا تایم‌لاین را انتخاب کنید؛ ویرا صدای آن را آماده می‌کند. نیازی به ساخت فایل صوتی یا تنظیم خروجی ندارید.",
+  "If your Premiere installation cannot prepare timeline audio, you can still use Selected video or choose an audio file.":
+    "اگر پریمیر نتوانست صدای تایم‌لاین را آماده کند، از گزینه ویدیوی انتخاب‌شده یا یک فایل صوتی استفاده کنید.",
+  "Change speech service": "تغییر سرویس گفتار",
+  "Getting started": "شروع کار",
+  "Speech service connected": "سرویس گفتار متصل است",
+  "Connect your speech service": "سرویس گفتار را متصل کنید",
+  "Paste your API key. Keep the default settings.":
+    "کلید API را وارد کنید. تنظیمات پیش‌فرض آماده‌اند.",
+  "Choose what to subtitle": "ویدیوی خود را انتخاب کنید",
+  "Your whole timeline, a selected video, or an audio file.":
+    "تمام تایم‌لاین، یک ویدیوی انتخاب‌شده یا یک فایل صوتی.",
+  "Create your subtitles": "زیرنویس را بسازید",
+  "Choose the language, then click Generate subtitles.":
+    "زبان را انتخاب کنید و ساخت زیرنویس را بزنید.",
+  "Whole timeline": "تمام تایم‌لاین",
+  "Marked section": "محدوده مشخص‌شده",
+  "Selected video": "ویدیوی انتخاب‌شده",
+  "Your API key is a secret code from your speech service. Paste it below; the other settings are ready to use.":
+    "کلید API یک کد محرمانه از سرویس گفتار شماست. آن را اینجا وارد کنید؛ بقیه تنظیمات آماده‌اند.",
+  "Get an OpenAI API key": "دریافت کلید API از OpenAI",
+
   "Check caption text and timing.": "متن و زمان زیرنویس را بررسی کنید.",
   Keywords: "واژگان کلیدی",
   "One term per line. Hints improve names and specialized vocabulary.":
@@ -147,10 +180,6 @@ const fa: Record<string, string> = {
   "No key entered": "کلیدی وارد نشده",
   "Forget key": "پاک کردن کلید",
   "Timeline audio export": "خروجی صدای تایم‌لاین",
-  "Choose WAV preset": "انتخاب قالب WAV",
-  "No preset selected": "قالبی انتخاب نشده",
-  "Create an audio-only WAV export preset in Premiere, then select its .epr file here. Selected clips use FFmpeg directly.":
-    "در پریمیر یک قالب خروجی WAV فقط صوتی بسازید؛ سپس فایل epr آن را اینجا انتخاب کنید. کلیپ انتخابی مستقیماً با FFmpeg پردازش می‌شود.",
   "A few things worth knowing.": "چند نکته برای شروع.",
   "1. Connect": "۱. اتصال",
   "2. Transcribe": "۲. رونویسی",

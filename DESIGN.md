@@ -48,7 +48,7 @@ An editor's quiet, precise grading desk. Lilac marks decisions, charcoal surface
 
 ### Product context and register
 
-Product/tool for video editors, especially Persian speakers, on desktop macOS inside a resizable Premiere panel. English and Persian interface locales switch with full document direction. Subtitle content is multilingual independently of UI locale. No Japan-market business requirements are inferred from Japanese transcription support. All examples are visibly marked as sample data. Persian copy needs independent native review before public release.
+Product/tool for video editors, including beginners and especially Persian speakers, on desktop macOS inside a resizable Premiere panel. English and Persian interface locales switch with full document direction. Subtitle content is multilingual independently of UI locale. No Japan-market business requirements are inferred from Japanese transcription support. All examples are visibly marked as sample data. Persian copy needs independent native review before public release.
 
 The source is the user's brief and verified provider/Adobe contracts linked in README. This is a new repository without sibling UI. Workspace, Connections, and Guide share the same shell, fields, feedback, and typography. Avoid marketing hero patterns, neon-on-black contrast, or nested decorative cards.
 
@@ -110,3 +110,7 @@ Plain, editing-specific labels. Counts localize to the interface. Provider names
 - Do share controls and tokens across all three screens.
 - Don't claim verified keys before a real transcription succeeds.
 - Don't suggest that SRT retains visual styling.
+
+### Beginner workflow (v0.2)
+
+The maintained brief now explicitly requires beginner-friendly setup. Show a three-step getting-started strip, put provider/model configuration behind Change speech service, explain the API key in plain language, and prepare audio with Premiere's installed settings automatically. No normal product flow asks the user to understand WAV or .epr files. Keep all advanced typography and provider options reachable. The Mac preview installer owns file placement; its Welcome screen must disclose Adobe unsigned-extension mode. Signed distribution remains unresolved rather than implying Gatekeeper is bypassed.

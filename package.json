@@ -1,6 +1,6 @@
 {
   "name": "vira-captions",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "An open-source, Farsi-first subtitle studio for Adobe Premiere Pro.",
@@ -13,7 +13,8 @@
     "format:check": "prettier --check src tests scripts *.json *.md",
     "preview": "vite preview --host 127.0.0.1",
     "install:cep": "node scripts/install.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "package:mac": "npm run build && node scripts/package-mac.mjs"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.2.0",

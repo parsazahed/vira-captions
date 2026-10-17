@@ -240,3 +240,27 @@ test("successful transcription replaces sample and marks GPT timing estimated", 
   await expect(page.locator(".timing-label")).toContainText("Estimated timing");
   await expect(page.locator(".caption-row")).toHaveCount(2);
 });
+
+test("beginner setup explains the key and never asks for audio presets", async ({
+  page,
+}) => {
+  await expect(page.getByLabel("Getting started")).toBeVisible();
+  await expect(page.getByLabel("Model", { exact: true })).not.toBeVisible();
+  await page
+    .getByRole("button", { name: /Connect your speech service/ })
+    .click();
+  await expect(
+    page.getByText("Audio setup is automatic", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /preset/i })).toHaveCount(0);
+  await expect(page.getByText(/Your API key is a secret code/)).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /Get an OpenAI API key/ }),
+  ).toHaveAttribute("href", "https://platform.openai.com/api-keys");
+  await page
+    .getByRole("button", { name: "Workspace", exact: true })
+    .first()
+    .click();
+  await page.getByText("Change speech service", { exact: true }).click();
+  await expect(page.getByLabel("Model", { exact: true })).toBeVisible();
+});

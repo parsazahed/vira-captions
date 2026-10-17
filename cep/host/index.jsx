@@ -1,6 +1,5 @@
 /* ExtendScript runs in Premiere, separately from the React panel. ES3 syntax is intentional. */
 var Vira = (function () {
-    var preset = '';
     function json(value) {
         if (value === null) return 'null';
         if (typeof value === 'string') return '"' + value.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r/g, '\\r').replace(/\n/g, '\\n').replace(/\t/g, '\\t').replace(/[\x00-\x1f]/g, '') + '"';
@@ -20,12 +19,6 @@ var Vira = (function () {
     }
     return {
         sequence: function () { return run(function () { var s = active(); return { name: s.name, id: String(s.sequenceID), duration: Number(s.end) / 254016000000 }; }); },
-        choosePreset: function () { return run(function () {
-            var file = File.openDialog('Choose an audio-only WAV export preset (.epr)');
-            if (file && /\.epr$/i.test(file.name)) preset = file.fsName;
-            else if (file) throw new Error('Choose an Adobe .epr export preset.');
-            return { path: preset };
-        }); },
         audio: function (options) { return run(function () {
             var s = active(); var duration = Number(s.end) / 254016000000;
             if (options.mode === 'clip') {
@@ -39,13 +32,20 @@ var Vira = (function () {
                 if (!media || !new File(media).exists) throw new Error('Clip media is offline or nested. Use the sequence source.');
                 return { name: clip.name, path: media, inPoint: clip.inPoint.seconds, duration: clip.duration.seconds, offset: clip.start.seconds, sequenceId: String(s.sequenceID) };
             }
-            if (!preset || !new File(preset).exists) throw new Error('Choose an audio-only WAV .epr preset in Connections before exporting the timeline.');
+            var preset = '';
+            var candidates = options.presets || [];
+            for (var candidate = 0; candidate < candidates.length; candidate++) {
+                try {
+                    if (new File(candidates[candidate]).exists && /^\.?wav$/i.test(s.getExportFileExtension(candidates[candidate]))) { preset = candidates[candidate]; break; }
+                } catch (e) { /* Try the next installed Adobe setting. */ }
+            }
+            if (!preset) throw new Error('Vira could not prepare timeline audio on this Premiere installation. Try Selected video or choose an audio file instead. Your edit has not changed.');
             var start = options.mode === 'range' ? s.getInPointAsTime().seconds : 0;
             var end = options.mode === 'range' ? s.getOutPointAsTime().seconds : duration;
             if (start < 0 || end <= start || end > duration + 1) throw new Error('Set valid In and Out points in the sequence first.');
             var code = s.exportAsMediaDirect(options.output, preset, options.mode === 'range' ? 1 : 0);
-            if (code !== 'No Error' && code !== 0 && code !== true) throw new Error('Premiere audio export failed. Check your WAV preset.');
-            if (!new File(options.output).exists) throw new Error('Premiere did not create the WAV file. Check the export preset.');
+            if (code !== 'No Error' && code !== 0 && code !== true) throw new Error('Premiere could not prepare the audio. Try a selected video or a shorter marked section.');
+            if (!new File(options.output).exists) throw new Error('Premiere did not finish preparing the audio. Try a selected video instead.');
             return { name: s.name, duration: end - start, offset: start, sequenceId: String(s.sequenceID) };
         }); },
         saveFile: function (options) { return run(function () { var file = new File(options.filename).saveDlg('Save captions'); return { path: file ? file.fsName : '' }; }); },

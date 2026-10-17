@@ -1,0 +1,33 @@
+#!/bin/bash
+# Never run this script manually. macOS Installer provides its target volume as $3.
+set -euo pipefail
+editor_user=$(/usr/bin/stat -f '%Su' /dev/console)
+if [[ "$editor_user" == "root" || "$editor_user" == "loginwindow" || -z "$editor_user" ]]; then exit 1; fi
+editor_home=$(/usr/bin/dscl . -read "/Users/$editor_user" NFSHomeDirectory | /usr/bin/sed 's/^NFSHomeDirectory: //')
+[[ "$editor_home" == /* && "$editor_home" != "/" ]] || exit 1
+payload="${3%/}/Library/Application Support/Vira/Preview Payload"
+extensions="$editor_home/Library/Application Support/Adobe/CEP/extensions"
+target="$extensions/Vira"
+backups="$editor_home/Library/Application Support/Vira/Backups"
+/usr/bin/sudo -H -u "$editor_user" /bin/mkdir -p "$extensions" "$backups"
+staging=$(/usr/bin/mktemp -d "$extensions/.vira-install.XXXXXX")
+backup=''
+committed=0
+cleanup() {
+  /bin/rm -rf "$staging"
+  if [[ "$committed" == 0 && -n "$backup" && ! -e "$target" ]]; then /bin/mv "$backup" "$target"; fi
+}
+trap cleanup EXIT
+/bin/cp -R "$payload/." "$staging/"
+/usr/sbin/chown -R "$editor_user":staff "$staging"
+if [[ -e "$target" ]]; then
+  backup="$backups/Vira-$(/bin/date +%Y%m%d-%H%M%S)-$$"
+  /bin/mv "$target" "$backup"
+fi
+/bin/mv "$staging" "$target"
+committed=1
+# Disclosed on the installer's Welcome screen: the preview needs unsigned CEP support.
+/usr/bin/sudo -H -u "$editor_user" /usr/bin/defaults write com.adobe.CSXS.12 PlayerDebugMode 1
+/usr/bin/sudo -H -u "$editor_user" /usr/bin/defaults write com.adobe.CSXS.11 PlayerDebugMode 1
+/usr/sbin/chown "$editor_user":staff "$backups" "$editor_home/Library/Application Support/Vira"
+echo 'Vira is installed. Quit and reopen Premiere, then choose Window > Extensions > Vira Captions.'

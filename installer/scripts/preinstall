@@ -1,0 +1,8 @@
+#!/bin/bash
+# The Installer app runs this as root, but Vira belongs to the logged-in editor.
+set -euo pipefail
+editor_user=$(/usr/bin/stat -f '%Su' /dev/console)
+if [[ "$editor_user" == "root" || "$editor_user" == "loginwindow" || -z "$editor_user" ]]; then
+  echo 'Please log in to your Mac normally, then open the Vira installer again.' >&2
+  exit 1
+fi

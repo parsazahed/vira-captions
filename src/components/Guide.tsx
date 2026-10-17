@@ -8,19 +8,19 @@ export function Guide({ t }: { t: (key: string) => string }) {
         {[
           [
             "1. Connect",
-            "Add a key in Connections. Choose OpenAI for GPT transcription, or a timestamp-capable Whisper model for precise caption timing.",
+            "Click Connect your speech service and paste your API key. OpenAI and GPT transcribe are already selected for you.",
           ],
           [
             "2. Transcribe",
-            "In Premiere, select a clip, the sequence, or an In/Out range. In the browser, choose an audio file. Each generation sends one paid API request.",
+            "Choose Whole timeline for your entire edit, Selected video for one clip, or Marked section for the part between your In and Out marks. Vira prepares the audio automatically.",
           ],
           [
             "3. Refine",
-            "Edit text and timing, choose paragraph rules, then use Reflow to rebuild line breaks. Reflow estimates word positions within each current caption.",
+            "Choose the spoken language and click Generate subtitles. Read through the result, correct any words, and check when each caption appears.",
           ],
           [
             "4. Export",
-            "Import an SRT caption track into Premiere, or export SRT, VTT, and styled ASS. ASS needs a compatible renderer; Premiere does not import its styling.",
+            "Click Add to timeline to put the subtitles in your edit. You can also choose a look in Appearance or save a subtitle file with Export file.",
           ],
         ].map(([title, body]) => (
           <section className="panel settings-card" key={title}>

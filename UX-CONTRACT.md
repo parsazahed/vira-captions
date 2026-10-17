@@ -44,3 +44,9 @@ Browser preview is explicit. It supports files, providers subject to CORS, editi
 ## Release acceptance
 
 Automated unit/provider/host contract tests plus browser workflow checks run in CI. Premiere 24/25/26 macOS support is a target, not a certified matrix. Manual acceptance must verify export presets, real model calls, selected clip offsets, font shaping, and caption/overlay insertion on each supported host version. No paid API calls or Adobe runtime are part of the automated suite.
+
+## Beginner setup (v0.2)
+
+Source: user's explicit request for beginner-friendly installation and audio setup. The main screen shows Connect → Choose video → Generate. Model/provider choices live behind a disclosure; defaults remain OpenAI/gpt-transcribe/Persian. Keys remain session-only. Timeline extraction discovers stock WAV export settings only beside the active Premiere executable, then validates candidates via Premiere's getExportFileExtension. There is no manual preset picker. Missing stock settings produce a clear recovery message and preserve the edit. Do not silently switch a timeline mix to raw clip audio.
+
+The generated Mac GUI installer copies the extension for the active desktop user and backs up an existing installation outside Adobe's extension directory. Its Welcome screen explains that it enables Adobe unsigned-extension mode; this packaging script never executes the installer or changes system settings during development. Gatekeeper is not disabled. Signed/notarized distribution and actual installation acceptance are still pending.
